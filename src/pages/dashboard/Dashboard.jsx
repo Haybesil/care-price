@@ -7,26 +7,16 @@ import StatsCards from '../../components/dashboard/StatsCards';
 import AppointmentsTable from '../../components/dashboard/AppointmentsTable';
 import Loader, { InlineLoader } from '../../components/common/Loader';
 
-// Mock API call to fetch dashboard data
 const fetchDashboardData = async () => {
-  // Simulate API call delay
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
-  // In a real app, this would be an actual API call
-  // const response = await fetch('/api/dashboard');
-  // if (!response.ok) throw new Error('Failed to fetch dashboard data');
-  // return response.json();
-
-  // Mock data
   return {
     stats: {
       scheduled: 94,
       pending: 32,
       cancelled: 56,
     },
-    appointments: [
-      // ... existing mock data
-    ],
+    appointments: [],
   };
 };
 
@@ -43,7 +33,10 @@ const Dashboard = () => {
     const loadData = async () => {
       try {
         setIsLoading(true);
-        const data = await fetchDashboardData();
+        const [data] = await Promise.all([
+          fetchDashboardData(),
+          new Promise((resolve) => setTimeout(resolve, 3000)), 
+        ]);
         setDashboardData(data);
       } catch (err) {
         console.error('Error loading dashboard data:', err);
@@ -58,7 +51,6 @@ const Dashboard = () => {
   }, []);
 
   const handleLogout = () => {
-    // In a real app, this would clear the auth token
     localStorage.removeItem('authToken');
     toast.success('Logged out successfully');
     navigate('/login');

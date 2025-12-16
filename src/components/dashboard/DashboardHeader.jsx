@@ -23,13 +23,10 @@ const DashboardHeader = ({ onLogout }) => {
 
   const handleLogout = async () => {
     try {
-      // Show loading state
+      
       const toastId = toast.loading('Logging out...');
-
-      // Simulate API call
+      
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Call the onLogout function from props
       onLogout();
 
       toast.dismiss(toastId);
