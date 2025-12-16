@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { X } from 'lucide-react';
 
 const ConfirmationModal = ({
@@ -12,7 +12,29 @@ const ConfirmationModal = ({
   confirmButtonVariant = 'primary',
   children,
 }) => {
-  if (!isOpen) return null;
+  const modalRef = useRef(null);
+  const [isVisible, setIsVisible] = React.useState(false);
+  const isMounted = React.useRef(false);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      isMounted.current = true;
+      const timer = setTimeout(() => {
+        setIsVisible(true);
+      }, 10);
+      return () => clearTimeout(timer);
+    } else {
+      setIsVisible(false);
+      const timer = setTimeout(() => {
+        if (!isOpen) {
+          isMounted.current = false;
+        }
+      }, 700);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  if (!isOpen && !isVisible) return null;
 
   const buttonVariants = {
     primary: 'bg-[#24AE7C] hover:bg-[#1e8c64]',
@@ -21,23 +43,46 @@ const ConfirmationModal = ({
 
   const handleConfirm = (e) => {
     e.preventDefault();
-    onConfirm();
+    setIsVisible(false);
+    setTimeout(() => {
+      onConfirm();
+    }, 300); 
   };
 
   return (
-    <div className="fixed inset-0 backdrop-blur-xs bg-[rgba(0,0,0,0.5)] flex items-center justify-center z-50 p-4">
-      <div className="bg-[rgba(25,28,33,0.8)] backdrop-blur-xs rounded-lg w-full max-w-md">
+    <div
+      className={`fixed inset-0 flex items-center justify-center z-50 p-4 transition-all duration-700 ${
+        isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
+      }`}
+      style={{
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        backdropFilter: 'blur(4px)',
+        WebkitBackdropFilter: 'blur(4px)',
+      }}
+    >
+      <div
+        ref={modalRef}
+        className={`bg-[rgba(25,28,33,0.8)] backdrop-blur-xs rounded-lg w-full max-w-md transform transition-all duration-700 ease-in-out ${
+          isVisible
+            ? 'translate-y-0 opacity-100'
+            : 'translate-y-10 opacity-0 pointer-events-none'
+        }`}
+      >
         <div className="flex justify-between items-center p-4">
           <h2 className="text-xl font-semibold text-white">{title}</h2>
           <button
-            onClick={onClose}
+            onClick={(e) => {
+              e.preventDefault();
+              setIsVisible(false);
+              setTimeout(onClose, 300);
+            }}
             className="text-gray-400 hover:text-white"
             aria-label="Close"
           >
             <X className="h-6 w-6" />
           </button>
         </div>
-        <p className='text-base text-[#ABB8C4] font-medium pl-4'>{subtext}</p>
+        <p className="text-base text-[#ABB8C4] font-medium pl-4">{subtext}</p>
 
         <form onSubmit={handleConfirm} className="p-6">
           <div className="mb-6">

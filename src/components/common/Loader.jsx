@@ -2,7 +2,6 @@ import React from 'react';
 import {motion, AnimatePresence } from 'framer-motion';
 
 const Loader = ({
-  // text = 'Loading...',
   withBackdrop = false,
   backdropClass = '',
   fullScreen = true,
@@ -30,7 +29,6 @@ const Loader = ({
           <img src="/images/Logo.svg" alt="Logo" className="h-10 w-auto" />
         </motion.div>
       </AnimatePresence>
-      {/* {text && <p className="text-white text-sm font-medium mt-4">{text}</p>} */}
     </div>
   );
 
